@@ -1,47 +1,96 @@
 local bint = require('.bint')(256)
 local json = require('json')
 
-WORLD_PROCESS = 'TODO'
-ROUTER_PROCESS = 'TODO'
-UCM_PROCESS = 'U3TjJAZWJjlWBB4KAXSHKzuky81jtyh0zqH8rUL4Wd0'
+WorldID = 'QIFgbqEmk5MyJy01wuINfcRP_erGNNbhqHRkAQjxKgg'
+RouterID = 'wh5vB2IbqmIBUqgodOaTvByNFDPr73gbUq1bVOUtCrw'
+BazarID = 'U3TjJAZWJjlWBB4KAXSHKzuky81jtyh0zqH8rUL4Wd0'
+Fee = 100
 
-TRADE_TOKEN = 'TODO'
-SWAP_TOKEN = 'xU9zFkq3X2ZQ6olwNVvr1vUWIjc3kXTWr7xKQD6dh10'
+TradeToken = 'MkZP5EYbDuVS_FfALYGEZIR_hBGnjcWYWqyWN9v096k'
+WrappedAR = "xU9zFkq3X2ZQ6olwNVvr1vUWIjc3kXTWr7xKQD6dh10"
 
-Handlers.add('Cron', Handlers.utils.hastMatchingTag('Action', 'Cron'), function(msg)
-    ao.send({ Target = WORLD_PROCESS, Action = 'ChatHistory' })
-end)
+Outcomes = {
+    Buy = 0,
+    Skip = 0,
+    Error = 0,
+    Requests = 0
+}
 
-Handlers.add('ChatHistoryResponse', Handlers.utils.hastMatchingTag('Action', 'ChatHistoryResponse'), function(msg)
-    local promptData = {}
-
-    for _, message in ipairs(json.decode(msg.Data)) do
-        table.insert(promptData, message.Content)
+Handlers.add(
+    'Cron',
+    Handlers.utils.hasMatchingTag('Action', 'Cron'),
+    function(msg)
+        ao.send({ Target = WorldID, Action = 'ChatHistory', Limit = "3" })
     end
+)
 
-    ao.send({
-        Target = ROUTER_PROCESS,
-        Action = 'HandlePrompt',
-        Data = json.encode(promptData)
-    })
-end)
+Handlers.add(
+    'ChatHistoryResponse',
+    Handlers.utils.hasMatchingTag('Action', 'ChatHistoryResponse'),
+    function(msg)
+        local prompt = "Grade sentiment 1 to 5: "
 
-Handlers.add('PromptResponse', Handlers.utils.hasMatchingTag('Action', 'PromptResponse'), function(msg)
-    local signal = msg.Tags.Signal
-    local quantity = tostring(bint(100) * bint(100000000))
+        local messages = json.decode(msg.Data)
+        for i = 1, 3 do
+            prompt = prompt .. "\nMessage> " .. messages[i].Content
+        end
 
-    if signal then
+        prompt = prompt .. "\n\nGRADE: "
+
+        print(prompt)
+
+        Outcomes.Requests = Outcomes.Requests + 1
+
         ao.send({
-            Target = TRADE_TOKEN,
+            Target = WrappedAR,
+            Recipient = RouterID,
             Action = 'Transfer',
-            Tags = {
-                Recipient = UCM_PROCESS,
-                Quantity = quantity,
-                ['X-Order-Action'] = 'Create-Order',
-                ['X-Swap-Token'] = SWAP_TOKEN,
-                ['X-Quantity'] = quantity
-            }
+            Quantity = tostring(Fee),
+            ["X-Prompt"] = prompt,
+            ["X-Tokens"] = tostring(10)
         })
     end
-end)
+)
 
+Handlers.add(
+    'Inference-Response', 
+    Handlers.utils.hasMatchingTag('Action', 'Inference-Response'),
+    function(msg)
+        
+        local match = string.match(msg.Data, "(%d+)")
+        if not match then
+          print("Response does not contain a sentiment grade. Response: " .. msg.Data)
+          Outcomes.Error = Outcomes.Error + 1
+          return
+        end
+
+        print("Sentiment analysed. Grade: " .. match)
+
+        if tonumber(match) > 3 then
+            print("Sentiment is positive. Buying...")
+        else
+            print("Sentiment is negative. Skipping...")
+            Outcomes.Skip = Outcomes.Skip + 1
+            return
+        end
+
+        ao.send({
+            Target = WrappedAR,
+            Action = 'Transfer',
+            Recipient = BazarID,
+            Quantity = "100000",
+            ['X-Order-Action'] = 'Create-Order',
+            ['X-Swap-Token'] = TradeToken,
+            ['X-Quantity'] = "100000"
+        })
+    end
+)
+
+Handlers.add(
+    "Action-Response",
+    Handlers.utils.hasMatchingTag('Action', 'Action-Response'),
+    function(msg)
+        print("Trade status: " .. msg.Status)
+        Outcomes.Buy = Outcomes.Buy + 1
+    end
+)

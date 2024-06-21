@@ -2,9 +2,6 @@ WrappedAR = "xU9zFkq3X2ZQ6olwNVvr1vUWIjc3kXTWr7xKQD6dh10"
 
 Herd = {
     -- List of open worker processes
-    "B0YVJ83M9KstjfZeCNoK0m7MnhzEVlSMz-GDcq5gPQw",
-    "YVjnwtjnY1vSXMiJobLNgkr5Ft_LTECFXD5BufDNAaA",
-    "J7zej-2rL0oJ8cvNR-RNzMicLgXUIRwLMxMvf1T9Q2E",	
 	"t0BJd_XiGj_ImJeNgBjmjooq3h_YSA6AxKf2rA1owIk",
 	"q619HbaDOu2IAAHHZ3hMBeFJDcVAkRcnNrAVrMVJ03U"
 	"-2mxT-kgqxMUoSimS2xcCuQGNs9yhbryILBfanhcopA",
@@ -21,6 +18,9 @@ Herd = {
 	"g3k7frEMLlIw69bFqZEEf3AxcTXbe0SIW8ruhD7hBe0",
 	"3DoLwimFJUG3p_y2twB2BScEbhbBsFIK86nL1sT0iJQ",
 	"3txeC7qcVRuVJ-l34B8QprXSwrU08-kzsPCSm2u3Ajo"
+    "rAOuOXvQRNZcGOtT_GLoGAONC9W_6YsAQLpvr3twdvs",
+    "B4VlH3zAvxV8phFmNinVG8NLXON1msarsKwa0osmGfU",
+    "crN7jwF6pRTxGxkcfsSlubSISzTyJ8zCAFWKyLHRJVI"
 }
 Busy = {}
 Queue = {}

@@ -1,4 +1,3 @@
-local bint = require('.bint')(256)
 local json = require('json')
 
 WorldID = 'QIFgbqEmk5MyJy01wuINfcRP_erGNNbhqHRkAQjxKgg'

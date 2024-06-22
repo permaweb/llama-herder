@@ -8,7 +8,6 @@ In the background, `Llama-Herder` offers the services of [AOS-Llama](https://git
 
 `Llama-Herder` works by 'herding' a set of worker processes that are running AOS-Llama inference. The herder process manages the queue of requests and dispatches them to the available workers when they are available. Each worker runs fully asynchronously and in parallel.
 
-
 ## Getting Started
 
 Interacting with `Llama-Herder` is simple. There is a public `Llama-Herder` that is open for all to use, paying for the service using [Wrapped AR](https://aox.xyz/#/beta). This service presently runs Microsoft's Phi-3 Instruct model, as it is faster and efficent for most tasks. More public Llama Herders offering different models will be added over time.
@@ -31,18 +30,26 @@ APM.install("@sam/Llama-Herder")
 
 Run inference by calling the module:
 
+**Important:** _Remember that you will need to have [Wrapped AR](https://aox.xyz/#/beta) held by your process before you can run prompts!_
+
 ```lua
 Llama = require("@sam/Llama-Herder")
 
+-- Run a simple prompt that prints to the console:
+Llama.run("Write a story in 10 words or less.", 10)
+-- You will see your response on your terminal after 30 seconds to a few minutes (depending on your prompt length).
+
+-- Full inference arguments:
 Llama.run(
    "What is the meaning of life?", -- Your prompt
-   42, -- Number of tokens to generate
+   20, -- Number of tokens to generate
    function(generated_text) -- Optional: A function to handle the response
       -- Do something with your LLM inference response
    end,
    {
-      Fee = 100, -- Optional: The total fee in Winston you would like to pay; or
-      Multiplier = 1.1 -- Optional: The multiplier on the last accepted fee that you would like to pay
+      Fee = 100, -- Optional: The total fee in Winston you would like to pay; OR
+      Multiplier = 1.1 -- Optional: If not using an automatic or static fee,
+      -- you can set the multiplier on the last accepted fee that you would like to pay
    }
 )
 ```
@@ -78,6 +85,22 @@ ao.send({
    Action = 'Info'
 })
 ```
+
+## Examples
+
+The [examples](https://github.com/samcamwilliams/Llama-Herder/tree/main/examples) folder contains a few examples of how to use the `Llama-Herder` in practice.
+
+[`sentiment-agent.lua`](https://github.com/samcamwilliams/Llama-Herder/blob/main/examples/sentiment-agent.lua) is a simple example of a client that interacts with the `Llama-Herder` to analyze sentiment from chat history and make trading decisions based on the sentiment. This example uses 'raw' messages to interact with the open access `Llama-Herder`.
+
+[`chatbot.lua`](https://github.com/samcamwilliams/Llama-Herder/blob/main/examples/chatbot.lua) is a simple example of a client that uses the `Llama-Herder` module to send prompts and receive responses from the `Llama-Herder`. It writes its messages to a [DevChat](https://github.com/samcamwilliams/DevChat) room which anyone can join.
+
+Load the examples by cloning this repo. Run them using `.load` in the AOS CLI:
+
+```lua
+.load examples/chatbot.lua
+```
+
+Remember that your process will need Wrapped AR tokens before the bot will function!
 
 ## Running A Llama Herd
 

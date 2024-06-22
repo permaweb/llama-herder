@@ -26,13 +26,13 @@ First, make sure you have [APM](https://apm_betteridea.g8way.io/) installed. You
 Then, simply install the `Llama-Herder` package:
 
 ```lua
-APM.install("@sam/Llama-Herder")
+APM.install("Llama-Herder")
 ```
 
 Run inference by calling the module:
 
 ```lua
-Llama = require("@sam/Llama-Herder")
+Llama = require("Llama-Herder")
 
 Llama.run(
    "What is the meaning of life?", -- Your prompt

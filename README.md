@@ -36,7 +36,7 @@ Llama = require("@sam/Llama-Herder")
 
 Llama.run(
    "What is the meaning of life?", -- Your prompt
-   100, -- Number of tokens to generate
+   42, -- Number of tokens to generate
    function(generated_text) -- Optional: A function to handle the response
       -- Do something with your LLM inference response
    end,

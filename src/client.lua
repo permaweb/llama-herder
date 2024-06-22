@@ -1,8 +1,8 @@
 -- Llama Herder Client
 local M = {}
 
-M.herder = "wh5vB2IbqmIBUqgodOaTvByNFDPr73gbUq1bVOUtCrw"
-M.token = "xU9zFkq3X2ZQ6olwNVvr1vUWIjc3kXTWr7xKQD6dh10"
+M.herder = M.herder or "wh5vB2IbqmIBUqgodOaTvByNFDPr73gbUq1bVOUtCrw"
+M.token = M.token or "xU9zFkq3X2ZQ6olwNVvr1vUWIjc3kXTWr7xKQD6dh10"
 
 M.feeBase = M.feeBase or 0
 M.feeToken = M.feeToken or 0
@@ -12,8 +12,7 @@ M.feeBump = M.feeBump or 1.005 -- Increase the fee on the prior base by 0.5%
 M.infoCallback = M.infoCallback or nil
 M.inferenceCallbacks = M.inferenceCallbacks or {}
 M.printResponses = M.printResponses or true
-
-M.Reference = 0
+M.Reference = M.Reference or 0
 
 function M.getPrices(...)
     ao.send({ Target = M.herder, Action = "Info" })
@@ -23,7 +22,12 @@ function M.getPrices(...)
     end
 end
 
-function M.CalculateFee(prompt, tokens)
+function M.calculateFee(prompt, tokens)
+    if M.feeBase == 0 then
+        print("LlamaHerder: No base fee found. Get prices before calculating.")
+        return
+    end
+
     local tokenCount = tokens
     for _ in string.gmatch(prompt, "%w+") do
        tokenCount = tokenCount + 1
@@ -65,7 +69,7 @@ function M.run(...) -- prompt, tokens, callback, fees
         ["X-Tokens"] = tostring(tokens)
     }
 
-    local fee = M.CalculateFee(prompt, tokens) * M.lastMultiplier
+    local fee = M.calculateFee(prompt, tokens) * M.lastMultiplier
     
     if M.queueLength > 0 then
         fee = fee * M.feeBump
@@ -119,7 +123,6 @@ Handlers.add(
             msg.Action == "Inference-Response"
     end,
     function(msg)
-        -- print("LlamaHerder: Handling inference response...")
         local reference = msg["X-Reference"]
 
         if M.inferenceCallbacks[reference] then
@@ -127,7 +130,7 @@ Handlers.add(
             M.inferenceCallbacks[reference] = nil
         else
             if M.printResponses then
-                print(msg.Data)
+                print("LlamaHerder response: " .. msg.Data)
             end
         end
     end

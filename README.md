@@ -4,12 +4,16 @@
 
 The 'Llama as a Service' infrastructure is designed to provide AO users with a fully decentralized LLM inference environment that is easy to use. Send one simple AO message to the Llama herder and you will receive a response from one of the herded inference workers.
 
-`Llama-Herder` works by 'herding' a set of worker processes that are running Llama 3 inference. The herder process manages the queue of requests and dispatches them to the available workers when they are available. Each worker runs fully asynchronously and in parallel.
+In the background, `Llama-Herder` offers the services of [AOS-Llama](https://github.com/samcamwilliams/aos-llama), a port of [Llama.cpp](https://github.com/ggerganov/llama.cpp). AOS-Llama allows users to execute Meta's Llama models, Microsoft's Phi models, amongst many others in AO's fully onchain environment.
+
+`Llama-Herder` works by 'herding' a set of worker processes that are running AOS-Llama inference. The herder process manages the queue of requests and dispatches them to the available workers when they are available. Each worker runs fully asynchronously and in parallel.
 
 
 ## Getting Started
 
-Interacting with `Llama-Herder` is simple. You pay for the service using [Wrapped AR](https://aox.xyz/#/beta). There are two ways to interact with the herder:
+Interacting with `Llama-Herder` is simple. There is a public `Llama-Herder` that is open for all to use, paying for the service using [Wrapped AR](https://aox.xyz/#/beta). This service presently runs Microsoft's Phi-3 Instruct model, as it is faster and efficent for most tasks. More public Llama Herders offering different models will be added over time.
+
+There are two ways to interact with a herder:
 
 ### Using the AOS Library
 
@@ -32,7 +36,7 @@ Llama = require("@sam/Llama-Herder")
 
 Llama.run(
    "What is the meaning of life?", -- Your prompt
-   100, -- Maximum number of tokens to generate
+   100, -- Number of tokens to generate
    function(generated_text) -- Optional: A function to handle the response
       -- Do something with your LLM inference response
    end,

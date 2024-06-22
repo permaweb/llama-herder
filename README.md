@@ -1,46 +1,121 @@
-# Llama as a Service
+# Llama-Herder: Llamas as a decentralized Service
 ---
-![Llama-Service](https://ro2jxrzi2hqt3fk6o2zprjjrw75c7r7z6a4xopcwcu74nh23hdlq.arweave.net/i7SbxyjR4T2VXnay-KUxt_ovx_nwOXc8VhU_xp9bONc)
+![Llama-Herder](https://ro2jxrzi2hqt3fk6o2zprjjrw75c7r7z6a4xopcwcu74nh23hdlq.arweave.net/i7SbxyjR4T2VXnay-KUxt_ovx_nwOXc8VhU_xp9bONc)
 
-Llama as a Service is designed to provide the necessary workers and load balancing needed for inferencing inside Large Language Models (LLMs) on AO. This service is composed of two main components: the worker (`llama`) and the router (load balancer or `herder`).
+The 'Llama as a Service' infrastructure is designed to provide AO users with a fully decentralized LLM inference environment that is easy to use. Send one simple AO message to the Llama herder and you will receive a response from one of the herded inference workers.
 
-## Features
+`Llama-Herder` works by 'herding' a set of worker processes that are running Llama 3 inference. The herder process manages the queue of requests and dispatches them to the available workers when they are available. Each worker runs fully asynchronously and in parallel.
+
+
+## Getting Started
+
+Interacting with `Llama-Herder` is simple. You pay for the service using [Wrapped AR](https://aox.xyz/#/beta). There are two ways to interact with the herder:
+
+### Using the AOS Library
+
+First, make sure you have [APM](https://apm_betteridea.g8way.io/) installed. You can do so by running the following command on the AOS terminal:
+
+```bash
+.load-blueprint apm
+```
+
+Then, simply install the `Llama-Herder` package:
+
+```lua
+APM.install("@sam/Llama-Herder")
+```
+
+Run inference by calling the module:
+
+```lua
+Llama = require("@sam/Llama-Herder")
+
+Llama.run(
+   "What is the meaning of life?", -- Your prompt
+   100, -- Maximum number of tokens to generate
+   function(generated_text) -- Optional: A function to handle the response
+      -- Do something with your LLM inference response
+   end,
+   {
+      Fee = 100, -- Optional: The total fee in Winston you would like to pay; or
+      Multiplier = 1.1 -- Optional: The multiplier on the last accepted fee that you would like to pay
+   }
+)
+```
+
+Setting the multiplier allows you to prioritize your request over other users. The multiplier is a number that you can set to 1.05, 1.1, 1.2, etc. The higher the multiplier, the higher the priority of your request. AO can support any number of parallel processes, but [Forward Research](https://fwd.g8way.io) is currently subsidizing compute. Subsequently, `Llama-Herder` currently uses a set of ~20 parallel workers. This can be increased in the future if needed.
+
+### Sending Messages
+
+You can use the `Llama-Herder` directly by simply sending a message to it (via Wrapped AR) and it will return a response.
+
+```lua
+ao.send({
+   Target = 'xU9zFkq3X2ZQ6olwNVvr1vUWIjc3kXTWr7xKQD6dh10',
+   Action = 'Transfer',
+   Recipient = 'wh5vB2IbqmIBUqgodOaTvByNFDPr73gbUq1bVOUtCrw',
+   Quantity = Fee,
+   ['X-Prompt'] = 'What is the meaning of life?',
+   ['X-Tokens'] = '10'
+})
+```
+
+In order to calculate appropriate fees for your request, you can use the following formula:
+
+```lua
+Fee = (FeePerToken * Tokens) + SetPromptFee
+```
+
+You can get the current fees by sending a message with an `Action: Info` tag to the herder process. It will respond with a message containing the current rates.
+
+```lua
+ao.send({
+   Target = 'wh5vB2IbqmIBUqgodOaTvByNFDPr73gbUq1bVOUtCrw',
+   Action = 'Info'
+})
+```
+
+## Running A Llama Herd
+
+In general, most users will be well-served by using the public Llama herd as described above. In this section we describe how to run a Llama herd if you have requirements that make it necessary.
+
+### Core Features
 
 - Worker initialization and inference processing
 - Load balancing and request handling
 - Fee calculation and request queuing
 - Client example for sentiment analysis and trading decisions
 
-## Prerequisites
+### Prerequisites
 
 - [Node.js](https://nodejs.org/en) (v20.0 or later)
 - [AOS installed](https://cookbook_ao.arweave.dev/welcome/getting-started.html)
 
-## Breakdown
+### Architecture
 
-### Worker (Llama)
+#### Worker (Llama)
 
 The worker is responsible for handling inference requests. It loads the model, processes user prompts, and generates responses.
 
-#### Initialization
+##### Initialization
 - **ModelID:** `"ISrbGzQot05rs_HKC08O_SmkipYQnqB1yC3mjZZeEo"`
 - **RouterID:** `"wh5vB2IbqmIBUqgodOaTvByNFDPr73gbUq1bVOUtCrw"`
 - **Llama:** Llama instance or `nil`
 
-#### Key Functions
+##### Key Functions
 - **Init()**: Initializes the Llama instance by loading the model.
 - **ProcessRequest(userPrompt, tokenCount)**: Processes the user prompt and generates a response based on the token count.
 - **GeneratePrompt(userPrompt)**: Formats the user prompt for processing.
 
-#### Handlers
+##### Handlers
 - **Init**: Initializes the worker with the provided model ID.
 - **Inference**: Handles inference requests, ensuring they come from the router and processing them accordingly.
 
-### Router (Load Balancer or 'Herder')
+#### Router (Load Balancer or 'Herder')
 
 The router manages the distribution of inference tasks to available workers, handles payment calculations, and maintains a queue for pending requests.
 
-#### Key Variables
+##### Key Variables
 - **WrappedAR**: `"xU9zFkq3X2ZQ6olwNVvr1vUWIjc3kXTWr7xKQD6dh10"`
 - **Herd**: List of worker processes.
 - **Busy**: Tracks busy workers.
@@ -48,15 +123,15 @@ The router manages the distribution of inference tasks to available workers, han
 - **SetPromptFee**: Fee for setting the prompt.
 - **FeePerToken**: Fee per token generated.
 
-#### Key Functions
+##### Key Functions
 - **CalculateFee(prompt, tokens)**: Calculates the total fee based on the prompt and token count.
 - **DispatchWork()**: Dispatches work to available workers from the queue.
 
-#### Handlers
+##### Handlers
 - **Start-Inference**: Handles start-inference requests, validates payment, and queues the work.
 - **InferenceResponseHandler**: Handles responses from workers, sends the response back to the client, and updates the worker status.
 
-### Agent (Client Example)
+#### Agent (Client Example)
 
 An example client that interacts with the Llama service to analyze sentiment from chat history and make trading decisions based on the sentiment.
 
@@ -75,7 +150,7 @@ An example client that interacts with the Llama service to analyze sentiment fro
 - **Inference-Response**: Handles inference responses and makes trading decisions based on sentiment analysis.
 - **Action-Response**: Handles trade status responses.
 
-## Getting Started
+### Booting Up the Herd
 
 1. **Initialize the Worker**:
    - Open the aos command-line interface (CLI) by typing `aos` in your terminal and pressing Enter.
@@ -93,11 +168,8 @@ An example client that interacts with the Llama service to analyze sentiment fro
 3. **Handle Responses**:
    - The router receives responses from workers, forwards them to the original requesters, and updates the status of the workers.
 
-## Example
-
-**Example Client**:
-   - An example client periodically requests chat history, analyzes sentiment, and performs trading actions based on the analysis.
-
 ## Contributing
 
 We welcome contributions! If you find a bug or have suggestions, please open an issue. If you'd like to contribute code, please fork the repository and submit a pull request.
+
+🦙🦙🦙🦙🦙

@@ -27,7 +27,7 @@ Handlers.add(
   function(msg)
     ModelID = msg.Tags["Model-ID"] or ModelID
     Init()
-    Send({ Action = "Worker-Initialized" })
+    Send({ Target = msg.From, Action = "Worker-Initialized" })
   end
 )
 

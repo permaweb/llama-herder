@@ -26,13 +26,13 @@ First, make sure you have [APM](https://apm_betteridea.g8way.io/) installed. You
 Then, simply install the `Llama-Herder` package:
 
 ```lua
-APM.install("Llama-Herder")
+APM.install("@sam/Llama-Herder")
 ```
 
 Run inference by calling the module:
 
 ```lua
-Llama = require("Llama-Herder")
+Llama = require("@sam/Llama-Herder")
 
 Llama.run(
    "What is the meaning of life?", -- Your prompt
@@ -47,7 +47,7 @@ Llama.run(
 )
 ```
 
-Setting the multiplier allows you to prioritize your request over other users. The multiplier is a number that you can set to 1.05, 1.1, 1.2, etc. The higher the multiplier, the higher the priority of your request. AO can support any number of parallel processes, but [Forward Research](https://fwd.g8way.io) is currently subsidizing compute. Subsequently, `Llama-Herder` currently uses a set of ~20 parallel workers. This can be increased in the future if needed.
+Setting the multiplier allows you to prioritize your request over other users. The multiplier is a number that you can set to 1.05, 1.1, 1.2, etc. The higher the multiplier, the higher the priority of your request. AO can support any number of parallel processes, but [Forward Research](https://fwd.g8way.io) is currently subsidizing compute. Subsequently, the open access `Llama-Herder` currently uses a set of ~20 parallel workers. This can be increased in the future as needed.
 
 ### Sending Messages
 

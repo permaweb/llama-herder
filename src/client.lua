@@ -97,7 +97,7 @@ function M.run(...) -- prompt, tokens, callback, fees
 end
 
 Handlers.add(
-    "LlamaHerder:Info-Response",
+    "LlamaHerder.Info-Response",
     function(msg)
         return msg.From == M.herder and
             msg.Action == "Info-Response"
@@ -117,7 +117,7 @@ Handlers.add(
 )
 
 Handlers.add(
-    "LlamaHerder:Inference-Response",
+    "LlamaHerder.Inference-Response",
     function(msg)
         return msg.From == M.herder and
             msg.Action == "Inference-Response"

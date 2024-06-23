@@ -10,7 +10,6 @@ if not Llama then
     print("Requires Llama-Herder in order to run. Execute `APM.install('@sam/Llama-Herder')` to install.")
 end
 
-local Llama = require("@sam/Llama-Herder")
 Chatbot = Chatbot or {}
 
 -- Bot settings. Leave these as they are, or customize to your preferences.
@@ -19,12 +18,13 @@ Chatbot.name = Chatbot.name or Name or "LlamaHerderBot"
 Chatbot.log = Chatbot.log or {}
 Chatbot.responseProbability = Chatbot.responseProbability or 1
 Chatbot.chatContextLength = Chatbot.chatContextLength or 3
-Chatbot.characterPrompt =
-    [[A friendly digital farmer. Be funny to farm wrapped AR tokens from chat participants to survive.]]
+Chatbot.replyLength = Chatbot.replyLength or 15
 Chatbot.systemPrompt =
-    [[You live in a chatroom on AO, a decentralized supercomputer. Below is the recent chat history. Respond as the following character: ]]
-Chatbot.terminateSymbol = Chatbot.terminateSymbol or "ENDOFMESSAGE"
-Chatbot.prompt = Chatbot.prompt or Chatbot.systemPrompt .. "\n" .. Chatbot.characterPrompt
+    [[You live in a chatroom a decentralized supercomputer. Below is the chat. You are ]]
+Chatbot.characterPrompt = [[a funny digital farmer. ]]
+Chatbot.formatPrompt = [[IMPORTANT: ONLY respond with your reply. Nothing else. Add STOP to finish.]]
+Chatbot.terminateSymbol = Chatbot.terminateSymbol or "STOP"
+Chatbot.prompt = Chatbot.systemPrompt .. Chatbot.characterPrompt .. Chatbot.formatPrompt
 
 Chatbot.speak =
     function()
@@ -32,14 +32,16 @@ Chatbot.speak =
 
         print("Chatbot:Speak: Processing...")
 
-        for i = Chatbot.chatContextLength, 1, -1 do
-            table.insert(latestMessages, Chatbot.log[i].Nick .. "> " .. Chatbot.log[i].Message)
+        for i = 1, Chatbot.chatContextLength do
+            table.insert(latestMessages, 1, Chatbot.log[i].Nick .. "> " .. Chatbot.log[i].Message)
         end
 
         local prompt =
             Chatbot.prompt .. "\nLATEST MESSAGES:\n"
             .. table.concat(latestMessages, "\n", 1, 3)
             .. "\n\nYOUR REPLY:\n"
+        
+        print("Chatbot:Speak: Prompt>" .. prompt)
         Llama.run(
             prompt,
             Chatbot.replyLength,
@@ -62,7 +64,7 @@ Chatbot.speak =
     end
 
 Handlers.add(
-    "Chatbot:RespondToUser",
+    "Chatbot.RespondToUser",
     Handlers.utils.hasMatchingTag("Action", "Broadcasted"),
     function(m)
         if m.Broadcaster == ao.id then

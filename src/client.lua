@@ -126,7 +126,7 @@ Handlers.add(
         local reference = msg["X-Reference"]
 
         if M.inferenceCallbacks[reference] then
-            M.inferenceCallbacks[reference](msg.Data)
+            M.inferenceCallbacks[reference](msg.Data, msg)
             M.inferenceCallbacks[reference] = nil
         else
             if M.printResponses then

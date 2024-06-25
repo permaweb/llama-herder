@@ -43,7 +43,7 @@ Llama.run("Write a story in 10 words or less.", 10)
 Llama.run(
    "What is the meaning of life?", -- Your prompt
    20, -- Number of tokens to generate
-   function(generated_text) -- Optional: A function to handle the response
+   function(generated_text, response_message) -- Optional: A function to handle the response
       -- Do something with your LLM inference response
    end,
    {

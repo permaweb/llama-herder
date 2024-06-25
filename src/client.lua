@@ -36,7 +36,7 @@ function M.calculateFee(prompt, tokens)
     return M.feeBase + M.feeToken * tokenCount
 end
 
-function M.run(...) -- prompt, tokens, callback, fees
+function M.run(...) -- prompt, tokens, callback, fees, customReference
     local args = {...}
 
     if M.feeBase == 0 and not (select(4, ...) and select(4, ...).Fee) then
@@ -59,12 +59,15 @@ function M.run(...) -- prompt, tokens, callback, fees
     local tokens = select(2, ...)
     local callback = select(3, ...)
     local fees = select(4, ...)
+    local customReference = select(5, ...)
+
+    local reference = customReference or tostring(M.Reference)
 
     local msg = {
         Target = M.token,
         Action = "Transfer",
         Recipient = M.herder,
-        ["X-Reference"] = tostring(M.Reference),
+        ["X-Reference"] = reference,
         ["X-Prompt"] = prompt,
         ["X-Tokens"] = tostring(tokens)
     }
@@ -89,7 +92,7 @@ function M.run(...) -- prompt, tokens, callback, fees
     M.lastFeePaid = fee
 
     if callback then
-        M.inferenceCallbacks[tostring(M.Reference)] = callback
+        M.inferenceCallbacks[reference] = callback
     end
     
     ao.send(msg)

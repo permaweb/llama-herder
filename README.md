@@ -50,7 +50,8 @@ Llama.run(
       Fee = 100, -- Optional: The total fee in Winston you would like to pay; OR
       Multiplier = 1.1 -- Optional: If not using an automatic or static fee,
       -- you can set the multiplier on the last accepted fee that you would like to pay
-   }
+   },
+   "myCustomReference" -- Optional: A custom reference for your request (will show up in the response_message's 'X-Reference' field)
 )
 ```
 

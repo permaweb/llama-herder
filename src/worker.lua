@@ -17,10 +17,6 @@ function ProcessRequest(userPrompt, tokenCount)
   return response
 end
 
-function GeneratePrompt(userPrompt)
-  return "<|USER|>" .. userPrompt .. "<|ASSISTANT|>"
-end
-
 Handlers.add(
   "Init",
   Handlers.utils.hasMatchingTag("Action", "Init"),

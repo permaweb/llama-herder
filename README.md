@@ -132,7 +132,6 @@ The worker is responsible for handling inference requests. It loads the model, p
 ##### Key Functions
 - **Init()**: Initializes the Llama instance by loading the model.
 - **ProcessRequest(userPrompt, tokenCount)**: Processes the user prompt and generates a response based on the token count.
-- **GeneratePrompt(userPrompt)**: Formats the user prompt for processing.
 
 ##### Handlers
 - **Init**: Initializes the worker with the provided model ID.
